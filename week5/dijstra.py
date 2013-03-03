@@ -12,6 +12,7 @@ while X != V:
   Add v to X, A[v] = A[u] + l(u, v)
 """
 
+import collections
 import doctest
 import heapq
 import random
@@ -19,51 +20,33 @@ import random
 
 _INF = float('inf')
 
+class _Node(object):
+    def __init__(self, label, dist, explored):
+        self.dist = dist
+        self.explored = explored
+        self.label = label
 
-class Node(object):
-    """A vertex in graph."""
-    def __init__(self, n):
-        """Convert the orignal node to an instance of Node class."""
-        self.n = n
-        self._outedges = []
-        self._inedges = []
-        self.dist = float('inf')
-        self.explored = False
+    def __str__(self):
+        return str(self.label)
 
-    def out_edges(self):
-        """yield outgoing edges of this node."""
-        for t in self._outedges:
-            yield t
-
-    def in_edges(self):
-        """yield incoming edges to this node."""
-        for s in self._inedges:
-            yield s
-
-    @classmethod
-    def convert_graph(cls, g):
-        """Convert the input graph to use Node class."""
-        graph = {}
-        nodes = {}
-        def _get_node(n):
-            if n not in nodes:
-                nodes[n] = Node(n)
-            return nodes[n]
-
-        for s in g:
-            node_s = _get_node(s)
-            if node_s not in graph:
-                graph[node_s] = {}
-            for t in g[s]:
-                node_t = _get_node(t)
-                node_s._outedges.append(node_t)
-                node_t._inedges.append(node_s)
-                graph[node_s][node_t] = g[s][t]
-
-        return graph, nodes
+    def __repr__(self):
+        return str((self.label, self.dist, self.explored))
 
 
-def dijstra(g, s):
+def _create_node_dict(graph):
+    """Create a dictionary of nodes with vertex of graph as key and
+       instance of _Node as value."""
+    nodes = {}
+    # Build dictionary of nodes."""
+    for n1 in graph:
+        if n1 not in nodes:
+            nodes[n1] = _Node(n1, _INF, False)
+        for n2 in graph[n1]:
+            if n2 not in nodes:
+                nodes[n2] = _Node(n2, _INF, False)
+    return nodes
+
+def dijstra(graph, s):
     """Return shortest path from s to all other nodes in g.
 
     >>> g = {'a': {'b': 10}, 'b': {'c': 20}}
@@ -73,16 +56,15 @@ def dijstra(g, s):
     >>> dijstra(g, 'a')
     {'a': 0, 'c': 20, 'b': 10}
     """
-    graph, nodes = Node.convert_graph(g)
-    s = nodes[s]
+    nodes = _create_node_dict(graph)
 
     # node has been explored
-    s.dist = 0
-    s.explored = True
+    nodes[s].dist = 0
+    nodes[s].explored = True
 
     # unexplored
     unexplored = []
-    for label, t in nodes.items():
+    for t in nodes:
         if t is s: continue
         if t in graph[s]:
             # has direct link from explored set to unexplored set
@@ -90,22 +72,22 @@ def dijstra(g, s):
         else:
             dist = float('inf')
         heapq.heappush(unexplored, (dist, t))
-        t.dist = dist
-
+        nodes[t].dist = dist
     while len(unexplored) > 0:
         dist, t = heapq.heappop(unexplored)
-        if t.explored: continue
-        t.dist = dist
-        t.explored = True
+        node_t = nodes[t]
+        if node_t.explored: continue
+        node_t.dist = dist
+        node_t.explored = True
 
         if t not in graph: continue
 
         for nt in graph[t]:
-            if nt.explored: continue
-            if t.dist + graph[t][nt] < nt.dist:
-                nt.dist = t.dist + graph[t][nt]
-                heapq.heappush(unexplored, (nt.dist, nt))
-
+            node_nt = nodes[nt]
+            if node_nt.explored: continue
+            if node_t.dist + graph[t][nt] < node_nt.dist:
+                node_nt.dist = node_t.dist + graph[t][nt]
+                heapq.heappush(unexplored, (node_nt.dist, nt))
     dist = {}
     for n in nodes:
         dist[n] = nodes[n].dist
@@ -128,3 +110,5 @@ def read_input(file_name):
 
 if __name__ == '__main__':
     doctest.testmod()
+    g = {'a': {'b': 10}, 'b': {'c': 20}}
+    print dijstra(g, 'a')
