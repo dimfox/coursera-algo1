@@ -76,7 +76,8 @@ def meadian(stream):
         elif upper_half.len() > lower_half.len():
             result.append(upper_half.top())
         else:
-            result.append(float(lower_half.top() + upper_half.top())/2)
+            #result.append(float(lower_half.top() + upper_half.top())/2)
+            result.append(lower_half.top())
     return result
 
 def _brute_force(stream):
@@ -110,6 +111,21 @@ def random_tests(test_cnt=3000):
         assert sol1 == sol2, '%s\n%s\n%s\n' % (problem, sol1, sol2)
 
 
+def read_input(file_name):
+    int_array = []
+    with open(file_name) as f:
+        for line in f:
+            x = int(line)
+            int_array.append(x)
+    return int_array
+
+
 if __name__ == '__main__':
-    doctest.testmod()
-    random_tests(300)
+    #doctest.testmod()
+    #random_tests(300)
+
+    int_array = read_input('/Users/weliu/Downloads/Median.txt')
+    ms = meadian(int_array)
+    print int_array
+    print ms
+    print sum(ms) % 10000

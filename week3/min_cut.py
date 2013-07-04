@@ -216,5 +216,3 @@ def read_input(filename):
 if __name__ == '__main__':
   test()
   test_random()
-
-

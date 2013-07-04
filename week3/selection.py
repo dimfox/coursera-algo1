@@ -34,7 +34,7 @@ def selection(a, k):
     >>> selection([1, 4, 6, 2, 0], 4)
     6
     """
-    
+
     return _selection(a, k, 0, len(a), _choose_pivot_first_element)
 
 def _choose_pivot_first_element(a, start_ind, end_ind):
@@ -51,28 +51,28 @@ def _selection(a, k, start_ind, end_ind, choose_pivot_func):
     # move items <= pivot to left of the pivot, >= pivot to right of the pivot
     right_to_pivot_pos = start_ind + 1
     for i in range(start_ind + 1, end_ind):
-        if a[i] < pivot:
-            a[i], a[right_to_pivot_pos] = a[right_to_pivot_pos], a[i]
-            right_to_pivot_pos += 1
+	if a[i] < pivot:
+	    a[i], a[right_to_pivot_pos] = a[right_to_pivot_pos], a[i]
+	    right_to_pivot_pos += 1
     # swap pivot item to its location
     pivot_pos = right_to_pivot_pos - 1
     a[pivot_pos], a[start_ind] = a[start_ind], a[pivot_pos]
 
     if pivot_pos == k:
-        return a[k]
+	return a[k]
     elif pivot_pos > k:
-        return _selection(a, k, start_ind, pivot_pos, choose_pivot_func)
+	return _selection(a, k, start_ind, pivot_pos, choose_pivot_func)
     else:
-        return _selection(a, k, pivot_pos + 1, end_ind, choose_pivot_func)
+	return _selection(a, k, pivot_pos + 1, end_ind, choose_pivot_func)
 
 def test_selection(test_cnt=3000):
     for _ in xrange(test_cnt):
-        problem_size = random.randint(1, 2000)
-        problem = range(problem_size)
-        random.shuffle(problem)
-        k = random.randint(0, problem_size) 
-        if k >= problem_size: continue
-        assert selection(problem, k) == k
+	problem_size = random.randint(1, 2000)
+	problem = range(problem_size)
+	random.shuffle(problem)
+	k = random.randint(0, problem_size)
+	if k >= problem_size: continue
+	assert selection(problem, k) == k
 
 if __name__ == '__main__':
     doctest.testmod()
